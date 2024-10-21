@@ -15,6 +15,12 @@ public class RenderScreen {
 	private float angleY = 0;
 	private double lastMouseX = -1.0, lastMouseY = -1.0;
 
+
+	private float posX = 0.0f;
+	private float posY = 0.0f;
+	private float posZ = 5.0f;
+	float speed = 0.1f;
+
 	public void run() {
 		System.out.println(Version.getVersion());
 
@@ -36,7 +42,7 @@ public class RenderScreen {
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-		window = glfwCreateWindow(1200, 800, "3D Labyrinth", NULL, NULL);
+		window = glfwCreateWindow(1500, 1000, "3D Labyrinth", NULL, NULL);
 
 		if (window == 0) throw new Error("GLFW window fehler");
 
@@ -55,7 +61,6 @@ public class RenderScreen {
 		gluPerspective(45.0f, aspect, 0.1f, 100.0f);
 		glMatrixMode(GL_MODELVIEW);
 
-
 		glClearColor(0.2f, 0.2f, 0.5f, 1.0f);//background
 
 		glfwSetCursorPosCallback(window, (window, xpos, ypos) -> {
@@ -63,22 +68,72 @@ public class RenderScreen {
 				double deltaX = xpos - lastMouseX;
 				double deltaY = ypos - lastMouseY;
 
-				angleX += deltaY / 5;
+				angleX += 0 / 5; //Nach oben und unten schauen an/aus
 				angleY += deltaX / 5;
 			}
 			lastMouseX = xpos;
 			lastMouseY = ypos;
 		});
 
+
+
+
+
 		while (!glfwWindowShouldClose(window)) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+			//tasten
 
-			//reset
+
+			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+				posX += speed * Math.sin(Math.toRadians(angleY));
+				posZ -= speed * Math.cos(Math.toRadians(angleY));
+				//System.out.println(Math.toRadians(angleY));
+				System.out.println("Position  x: " + posX + ", y: " + posY + ", z: " + posZ);
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+				posX -= speed * Math.sin(Math.toRadians(angleY));
+				posZ += speed * Math.cos(Math.toRadians(angleY));
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+				posX -= speed * Math.cos(Math.toRadians(angleY));
+				posZ -= speed * Math.sin(Math.toRadians(angleY));
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+				posX += speed * Math.cos(Math.toRadians(angleY));
+				posZ += speed * Math.sin(Math.toRadians(angleY));
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+				posY += speed;
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+				posY -= speed;
+			}
+
+			// bregrenzen
+			if(posY > 50) {
+				posY = 50;
+			}
+			if(posY < -50) {
+				posY = -50;
+			}
+
+
+
+
+			//beta rotate
 			glLoadIdentity();
-			glTranslatef(0.0f, 0.0f, -5.0f);//move
-			glRotatef(angleX, 1.0f, 0.0f, 0.0f);//rotate
+			glRotatef(angleX, 1.0f, 0.0f, 0.0f);
 			glRotatef(angleY, 0.0f, 1.0f, 0.0f);
+			glTranslatef(-posX, -posY, -posZ);
+
+
+
 
 
 			glBegin(GL_QUADS);
@@ -121,6 +176,10 @@ public class RenderScreen {
 			glVertex3f(1.0f, -1.0f, -1.0f);
 
 			glEnd();
+
+
+
+
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
