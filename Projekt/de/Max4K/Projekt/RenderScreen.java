@@ -15,18 +15,13 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class RenderScreen {
 
 	private long window;
-	private float angleX = 0;
-	private float angleY = 0;
+
 	private double lastMouseX = -1.0, lastMouseY = -1.0;
 	private static final int GRID_SIZE = 30;
 	private boolean[][] field;
 	private FieldGenerator fieldGen;
+	private Inputs inputs;
 
-
-	private float posX = 2 ;
-	private float posY = 1.0f;
-	private float posZ = 2 ;
-	float speed = 0.1f;
 
 
 
@@ -38,6 +33,7 @@ public class RenderScreen {
 		System.out.println(Version.getVersion());
 
 		create();
+		inputs = new Inputs(window);
 		loop();
 
 		glfwFreeCallbacks(window);
@@ -80,76 +76,25 @@ public class RenderScreen {
 
 		glClearColor(0.2f, 0.2f, 0.5f, 1.0f);//background
 
-		glfwSetCursorPosCallback(window, (window, xpos, ypos) -> {
-			if (lastMouseX != -1 && lastMouseY != -1) {
-				double deltaX = xpos - lastMouseX;
-				double deltaY = ypos - lastMouseY;
-
-				angleX += deltaY / 5; //Nach oben und unten schauen an/aus
-				angleY += deltaX / 5;
-			}
-			lastMouseX = xpos;
-			lastMouseY = ypos;
-		});
-
-
-
 
 
 		while (!glfwWindowShouldClose(window)) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			//tasten
 
-
-			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-				posX += speed * Math.sin(Math.toRadians(angleY));
-				posZ -= speed * Math.cos(Math.toRadians(angleY));
-				//System.out.println(Math.toRadians(angleY));
-				if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-					speed = 0.2f;
-				} else {
-					speed = 0.1f;
-				}
-				System.out.println("Position  x: " + posX + ", y: " + posY + ", z: " + posZ);
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-				posX -= speed * Math.sin(Math.toRadians(angleY));
-				posZ += speed * Math.cos(Math.toRadians(angleY));
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-				posX -= speed * Math.cos(Math.toRadians(angleY));
-				posZ -= speed * Math.sin(Math.toRadians(angleY));
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-				posX += speed * Math.cos(Math.toRadians(angleY));
-				posZ += speed * Math.sin(Math.toRadians(angleY));
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-				posY += speed;
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-				posY -= speed;
-			}
-
-
-			// bregrenzen
-			if(posY > 50) {
-				posY = 50;
-			}
-			if(posY < -50) {
-				posY = -50;
-			}
+			float posX = inputs.getPosX();
+			float posY = inputs.getPosY();
+			float posZ = inputs.getPosZ();
+			float angleX = inputs.getAngleX();
+			float angleY = inputs.getAngleY();
+			inputs.KeyPresses(window);
 
 
 
 
-			//beta rotate
+
+
+			//rotate
 			glLoadIdentity();
 			glRotatef(angleX, 1.0f, 0.0f, 0.0f);
 			glRotatef(angleY, 0.0f, 1.0f, 0.0f);
