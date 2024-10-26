@@ -3,6 +3,10 @@ package de.Max4K.Projekt;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
+
+import java.util.Random;
+import java.util.Stack;
+
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -14,12 +18,21 @@ public class RenderScreen {
 	private float angleX = 0;
 	private float angleY = 0;
 	private double lastMouseX = -1.0, lastMouseY = -1.0;
+	private static final int GRID_SIZE = 30;
+	private boolean[][] field;
+	private FieldGenerator fieldGen;
 
 
-	private float posX = 0.0f;
-	private float posY = 0.0f;
-	private float posZ = 5.0f;
+	private float posX = 2 ;
+	private float posY = 1.0f;
+	private float posZ = 2 ;
 	float speed = 0.1f;
+
+
+
+	public RenderScreen() {
+		fieldGen = new FieldGenerator();
+	}
 
 	public void run() {
 		System.out.println(Version.getVersion());
@@ -53,6 +66,10 @@ public class RenderScreen {
 	}
 
 	void loop() {
+
+		field = fieldGen.generateField();
+
+
 		glEnable(GL_DEPTH_TEST);
 
 		glMatrixMode(GL_PROJECTION);
@@ -68,7 +85,7 @@ public class RenderScreen {
 				double deltaX = xpos - lastMouseX;
 				double deltaY = ypos - lastMouseY;
 
-				angleX += 0 / 5; //Nach oben und unten schauen an/aus
+				angleX += deltaY / 5; //Nach oben und unten schauen an/aus
 				angleY += deltaX / 5;
 			}
 			lastMouseX = xpos;
@@ -89,6 +106,11 @@ public class RenderScreen {
 				posX += speed * Math.sin(Math.toRadians(angleY));
 				posZ -= speed * Math.cos(Math.toRadians(angleY));
 				//System.out.println(Math.toRadians(angleY));
+				if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+					speed = 0.2f;
+				} else {
+					speed = 0.1f;
+				}
 				System.out.println("Position  x: " + posX + ", y: " + posY + ", z: " + posZ);
 			}
 
@@ -115,6 +137,7 @@ public class RenderScreen {
 				posY -= speed;
 			}
 
+
 			// bregrenzen
 			if(posY > 50) {
 				posY = 50;
@@ -133,47 +156,47 @@ public class RenderScreen {
 			glTranslatef(-posX, -posY, -posZ);
 
 
-
-
+			float squareSize = 5.0f;//Grösse der Vierecke.
+			float startX = -GRID_SIZE/2  * squareSize;
+			float startZ = -GRID_SIZE/2 * squareSize;
 
 			glBegin(GL_QUADS);
+			for (int x = 0; x <  GRID_SIZE; x++) {
+				for (int z = 0; z < GRID_SIZE; z++) {
 
-			//cube
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glVertex3f(-1.0f, -1.0f, 1.0f);
-			glVertex3f(1.0f, -1.0f, 1.0f);
-			glVertex3f(1.0f, 1.0f, 1.0f);
-			glVertex3f(-1.0f, 1.0f, 1.0f);
 
-			glColor3f(0.0f, 1.0f, 0.0f);
-			glVertex3f(-1.0f, -1.0f, -1.0f);
-			glVertex3f(-1.0f, 1.0f, -1.0f);
-			glVertex3f(1.0f, 1.0f, -1.0f);
-			glVertex3f(1.0f, -1.0f, -1.0f);
+					if (field[x][z]) {
+						float xPos = startX + x * squareSize;
+						float zPos = startZ + z * squareSize;
 
-			glColor3f(0.0f, 0.0f, 1.0f);
-			glVertex3f(-1.0f, -1.0f, -1.0f);
-			glVertex3f(-1.0f, -1.0f, 1.0f);
-			glVertex3f(-1.0f, 1.0f, 1.0f);
-			glVertex3f(-1.0f, 1.0f, -1.0f);
 
-			glColor3f(1.0f, 1.0f, 0.0f);
-			glVertex3f(1.0f, -1.0f, -1.0f);
-			glVertex3f(1.0f, -1.0f, 1.0f);
-			glVertex3f(1.0f, 1.0f, 1.0f);
-			glVertex3f(1.0f, 1.0f, -1.0f);
 
-			glColor3f(1.0f, 0.0f, 1.0f);
-			glVertex3f(-1.0f, 1.0f, -1.0f);
-			glVertex3f(-1.0f, 1.0f, 1.0f);
-			glVertex3f(1.0f, 1.0f, 1.0f);
-			glVertex3f(1.0f, 1.0f, -1.0f);
+						if (x == GRID_SIZE / 2 && z == GRID_SIZE / 2) {
+							glColor3f(1.0f, 0.0f, 0.0f); // Hauptfeld
+						} else {
+							glColor3f(0.3f, 0.6f, 0.3f);
+						}
 
-			glColor3f(0.0f, 1.0f, 1.0f);
-			glVertex3f(-1.0f, -1.0f, -1.0f);
-			glVertex3f(-1.0f, -1.0f, 1.0f);
-			glVertex3f(1.0f, -1.0f, 1.0f);
-			glVertex3f(1.0f, -1.0f, -1.0f);
+
+						glVertex3f(xPos, -1.0f, zPos);
+						glVertex3f(xPos + squareSize, -1.0f, zPos);
+						glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
+						glVertex3f(xPos, -1.0f, zPos + squareSize);
+
+
+
+
+					}
+				}
+			}
+
+
+
+
+
+
+
+
 
 			glEnd();
 
@@ -185,6 +208,7 @@ public class RenderScreen {
 			glfwPollEvents();
 		}
 	}
+
 
 	//LWJGL klasse für 3d
 	public static void gluPerspective(float fovY, float aspect, float zNear, float zFar) {
