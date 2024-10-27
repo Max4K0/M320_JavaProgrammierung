@@ -1,7 +1,6 @@
 package de.Max4K.Projekt;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -10,9 +9,9 @@ public class Inputs {
 
 	private float angleX = 0;
 	private float angleY = 0;
-	private double lastMouseX = -1.0;
-	private double lastMouseY = -1.0;
 	private float speed = 0.1f;
+	private boolean mouselock = true;
+
 
 	private float posX = 2 ;
 	private float posY = 1.0f;
@@ -20,19 +19,25 @@ public class Inputs {
 
 	public Inputs(long window) {
 
+
 		GLFW.glfwSetCursorPosCallback(window, new GLFWCursorPosCallback() {
 			@Override
 			public void invoke(long window, double xpos, double ypos) {
-				if(lastMouseX != -1 && lastMouseY != -1) {
-					double deltaX = xpos - lastMouseX;
-					double deltaY = ypos - lastMouseY;
 
 
-					angleX += deltaY/5;
-					angleY += deltaX/5;
-				}
-				lastMouseX = xpos;
-				lastMouseY = ypos;
+
+				double deltaX = xpos - 750;
+				double deltaY = ypos - 500;
+
+				angleX += deltaY / 10;
+				angleY += deltaX / 10;
+
+
+
+				glfwSetCursorPos(window, 750, 500); //750, 500 je nach bildschirmgrösse
+
+
+
 			}
 		});
 
@@ -79,6 +84,13 @@ public class Inputs {
 		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
 			posY -= speed;
 		}
+
+
+
+		if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+			glfwSetWindowShouldClose(window, true);
+		}
+
 
 
 		// bregrenzen

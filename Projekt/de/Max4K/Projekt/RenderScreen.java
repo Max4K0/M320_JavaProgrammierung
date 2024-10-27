@@ -4,9 +4,6 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
-import java.util.Random;
-import java.util.Stack;
-
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -16,7 +13,7 @@ public class RenderScreen {
 
 	private long window;
 
-	private double lastMouseX = -1.0, lastMouseY = -1.0;
+
 	private static final int GRID_SIZE = 30;
 	private boolean[][] field;
 	private FieldGenerator fieldGen;
@@ -51,6 +48,7 @@ public class RenderScreen {
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
+
 		window = glfwCreateWindow(1500, 1000, "3D Labyrinth", NULL, NULL);
 
 		if (window == 0) throw new Error("GLFW window fehler");
@@ -59,6 +57,7 @@ public class RenderScreen {
 		glfwSwapInterval(1);
 		GL.createCapabilities();
 		glfwShowWindow(window);
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	}
 
 	void loop() {
