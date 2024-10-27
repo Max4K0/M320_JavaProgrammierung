@@ -14,7 +14,7 @@ public class RenderScreen {
 	private long window;
 
 
-	private static final int GRID_SIZE = 30;
+	private static final int GRID_SIZE = 50;
 	private boolean[][] field;
 	private FieldGenerator fieldGen;
 	private Inputs inputs;
@@ -124,6 +124,8 @@ public class RenderScreen {
 
 						if (x == GRID_SIZE / 2 && z == GRID_SIZE / 2) {
 							glColor3f(1.0f, 0.0f, 0.0f); // Hauptfeld
+						} else if(x == fieldGen.targetX && z ==fieldGen.targetY) {
+							glColor3f(1.0f, 1.0f, 0.0f);
 						} else {
 							glColor3f(0.3f, 0.6f, 0.3f);
 						}

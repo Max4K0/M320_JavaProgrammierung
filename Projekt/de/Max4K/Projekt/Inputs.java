@@ -9,7 +9,7 @@ public class Inputs {
 
 	private float angleX = 0;
 	private float angleY = 0;
-	private float speed = 0.1f;
+	private float speed = 0.2f;
 	private boolean mouselock = true;
 
 
@@ -55,11 +55,11 @@ public class Inputs {
 			posZ -= speed * Math.cos(Math.toRadians(angleY));
 			//System.out.println(Math.toRadians(angleY));
 			if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-				speed = 0.2f;
+				speed = 0.5f;
 			} else {
-				speed = 0.1f;
+				speed = 0.2f;
 			}
-			System.out.println("Position  x: " + posX + ", y: " + posY + ", z: " + posZ);
+			//System.out.println("Position  x: " + posX + ", y: " + posY + ", z: " + posZ);
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {

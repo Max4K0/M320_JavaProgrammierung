@@ -3,8 +3,9 @@ package de.Max4K.Projekt;
 import java.util.Random;
 
 public class FieldGenerator {
-	private static final int GRID_SIZE = 30;
-
+	private static final int GRID_SIZE = 50;
+	public int targetX;
+	public int targetY;
 
 	public boolean[][] generateField() {
 		boolean[][] field = new boolean[GRID_SIZE][GRID_SIZE];
@@ -18,7 +19,7 @@ public class FieldGenerator {
 
 
 
-		for (int i = 0; i < 2; i++) {//i sind die versuche
+		for (int i = 0; i < 3; i++) {//i sind die versuche
 			int x = centerX;
 			int y = centerY;
 
@@ -44,6 +45,19 @@ public class FieldGenerator {
 				}
 			}
 		}
+
+
+		do {
+			targetX = random.nextInt(GRID_SIZE);
+			targetY = random.nextInt(GRID_SIZE);
+		} while ((!field[targetX][targetY]) || (targetX < 45 && targetX > 5) && (targetY < 45 && targetY > 5));
+
+		System.out.println("targetX: " + targetX + " targetY: " + targetY);
+
+
+
 		return field;
 	}
+
+
 }
