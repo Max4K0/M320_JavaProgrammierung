@@ -100,10 +100,6 @@ public class RenderScreen {
 			inputs.KeyPresses(window);
 
 
-
-
-
-
 			//rotate
 			glLoadIdentity();
 			glRotatef(angleX, 1.0f, 0.0f, 0.0f);
@@ -138,18 +134,12 @@ public class RenderScreen {
 						glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
 						glVertex3f(xPos, -1.0f, zPos + squareSize);
 
-
+						renderWalls(x,z,xPos,zPos,squareSize);
 
 
 					}
 				}
 			}
-
-
-
-
-
-
 
 
 
@@ -163,6 +153,63 @@ public class RenderScreen {
 			glfwPollEvents();
 		}
 	}
+
+
+
+	void renderWalls(int x, int z, float xPos, float zPos, float squareSize) {
+
+
+		glColor3f(0.8f, 0.8f, 0.8f);
+
+		//left
+		if(x==0 || !field[x-1][z]) {
+			glVertex3f(xPos, -1.0f, zPos);
+			glVertex3f(xPos, -1.0f + squareSize, zPos);
+			glVertex3f(xPos, -1.0f + squareSize, zPos + squareSize);
+			glVertex3f(xPos, -1.0f, zPos + squareSize);
+
+		}
+		//right
+		if(x == GRID_SIZE - 1 || !field[x+1][z]) {
+			glVertex3f(xPos + squareSize, -1.0f, zPos);
+			glVertex3f(xPos + squareSize, -1.0f + squareSize, zPos);
+			glVertex3f(xPos + squareSize, -1.0f + squareSize, zPos + squareSize);
+			glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
+		}
+
+		//front
+		if(z == 0 || !field[x][z-1]) {
+			glVertex3f(xPos, -1.0f, zPos);
+			glVertex3f(xPos + squareSize, -1.0f, zPos);
+			glVertex3f(xPos + squareSize, -1.0f + squareSize, zPos);
+			glVertex3f(xPos, -1.0f + squareSize, zPos);
+
+
+		}
+
+
+		if(z == GRID_SIZE - 1 || !field[x][z+1]) {
+
+			glVertex3f(xPos, -1.0f, zPos + squareSize);
+			glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
+			glVertex3f(xPos + squareSize, -1.0f + squareSize, zPos + squareSize);
+			glVertex3f(xPos, -1.0f + squareSize, zPos + squareSize);
+
+
+
+
+		}
+
+
+	}
+
+
+
+
+
+
+
+
 
 
 	//LWJGL klasse für 3d

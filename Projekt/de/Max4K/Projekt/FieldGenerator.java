@@ -5,14 +5,17 @@ import java.util.Random;
 public class FieldGenerator {
 	private static final int GRID_SIZE = 30;
 
+
 	public boolean[][] generateField() {
 		boolean[][] field = new boolean[GRID_SIZE][GRID_SIZE];
 		Random random = new Random();
+
 		int centerX = GRID_SIZE / 2;
 		int centerY = GRID_SIZE / 2;
 
 		//startfeld in der mitte
 		field[centerX][centerY] = true;
+
 
 
 		for (int i = 0; i < 2; i++) {//i sind die versuche
