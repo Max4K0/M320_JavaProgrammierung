@@ -53,11 +53,22 @@ public class RenderScreen {
 
 		if (window == 0) throw new Error("GLFW window fehler");
 
+
+
+		glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
+			glViewport(0, 0, width, height);
+			float aspectRatio = (float) width / height;
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			gluPerspective(45.0f, aspectRatio, 0.1f, 100.0f);
+			glMatrixMode(GL_MODELVIEW);
+		});
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
 		GL.createCapabilities();
 		glfwShowWindow(window);
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
 	}
 
 	void loop() {

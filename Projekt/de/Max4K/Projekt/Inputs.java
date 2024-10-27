@@ -1,7 +1,7 @@
 package de.Max4K.Projekt;
 
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
+
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -20,7 +20,7 @@ public class Inputs {
 	public Inputs(long window) {
 
 
-		GLFW.glfwSetCursorPosCallback(window, new GLFWCursorPosCallback() {
+		glfwSetCursorPosCallback(window, new GLFWCursorPosCallback() {
 			@Override
 			public void invoke(long window, double xpos, double ypos) {
 
@@ -84,10 +84,20 @@ public class Inputs {
 		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
 			posY -= speed;
 		}
+		if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_TRUE) {
+
+			if(glfwGetWindowAttrib(window, GLFW_MAXIMIZED) == GLFW_PRESS) {
+
+				glfwRestoreWindow(window);
+			} else {
+				glfwMaximizeWindow(window);
+			}
+		}
 
 
 
 		if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+
 			glfwSetWindowShouldClose(window, true);
 		}
 
