@@ -14,11 +14,10 @@ public class RenderScreen {
 	private long window;
 
 
-	private static final int GRID_SIZE = 50;
+	static final int GRID_SIZE = 50;
 	private boolean[][] field;
 	private FieldGenerator fieldGen;
 	private Inputs inputs;
-
 
 
 
@@ -92,12 +91,32 @@ public class RenderScreen {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
+
 			float posX = inputs.getPosX();
 			float posY = inputs.getPosY();
 			float posZ = inputs.getPosZ();
+
 			float angleX = inputs.getAngleX();
 			float angleY = inputs.getAngleY();
+			float oldPosX = inputs.getOldPosX();
+			float oldPosZ = inputs.getOldPosZ();
 			inputs.KeyPresses(window);
+
+			int gridX = (int) ((posX + (float) (50*5)/2)/5);//field nachahmen
+			int gridZ = (int) ((posZ + (float) (50*5)/2)/5);
+
+			//Grenzen prüfen und kollision hinzufügen.
+			if (!field[gridX][gridZ]) {
+
+				inputs.setPosX(oldPosX);
+				inputs.setPosZ(oldPosZ);
+			}
+
+
+
+
+
+
 
 
 			//rotate
@@ -146,6 +165,11 @@ public class RenderScreen {
 
 
 			glEnd();
+
+
+
+
+
 
 
 
@@ -204,11 +228,6 @@ public class RenderScreen {
 
 
 	}
-
-
-
-
-
 
 
 

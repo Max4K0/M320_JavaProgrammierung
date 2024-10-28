@@ -2,12 +2,15 @@ package de.Max4K.Projekt;
 
 import java.util.Random;
 
+import static de.Max4K.Projekt.RenderScreen.GRID_SIZE;
+
 public class FieldGenerator {
-	private static final int GRID_SIZE = 50;
+
 	public int targetX;
 	public int targetY;
 
 	public boolean[][] generateField() {
+
 		boolean[][] field = new boolean[GRID_SIZE][GRID_SIZE];
 		Random random = new Random();
 
@@ -16,7 +19,6 @@ public class FieldGenerator {
 
 		//startfeld in der mitte
 		field[centerX][centerY] = true;
-
 
 
 		for (int i = 0; i < 3; i++) {//i sind die versuche

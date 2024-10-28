@@ -16,7 +16,8 @@ public class Inputs {
 	private float posX = 2 ;
 	private float posY = 1.0f;
 	private float posZ = 2 ;
-
+	private float oldPosX = posX;
+	private float oldPosZ = posZ;
 	public Inputs(long window) {
 
 
@@ -50,9 +51,16 @@ public class Inputs {
 
 
 	public void KeyPresses(long window) {
+
+
+		oldPosX = posX;
+		oldPosZ = posZ;
+
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 			posX += speed * Math.sin(Math.toRadians(angleY));
 			posZ -= speed * Math.cos(Math.toRadians(angleY));
+
+
 			//System.out.println(Math.toRadians(angleY));
 			if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
 				speed = 0.5f;
@@ -77,6 +85,7 @@ public class Inputs {
 			posZ += speed * Math.sin(Math.toRadians(angleY));
 		}
 
+
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 			posY += speed;
 		}
@@ -94,12 +103,11 @@ public class Inputs {
 			}
 		}
 
-
-
 		if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 
 			glfwSetWindowShouldClose(window, true);
 		}
+
 
 
 
@@ -112,6 +120,9 @@ public class Inputs {
 		}
 
 	}
+
+
+
 
 	public float getAngleX() {
 		return this.angleX;
@@ -129,4 +140,19 @@ public class Inputs {
 		return this.posZ;
 	}
 
+	public void setPosX(float posX) {
+		this.posX = posX;
+	}
+
+	public void setPosZ(float posZ) {
+		this.posZ = posZ;
+	}
+
+	public float getOldPosX() {
+		return oldPosX;
+	}
+
+	public float getOldPosZ() {
+		return oldPosZ;
+	}
 }
