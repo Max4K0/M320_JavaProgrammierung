@@ -2,14 +2,13 @@ package de.Max4K.Projekt;
 
 import java.util.Random;
 
-import static de.Max4K.Projekt.RenderScreen.GRID_SIZE;
 
 public class FieldGenerator {
 
 	public int targetX;
 	public int targetY;
 
-	public boolean[][] generateField() {
+	public boolean[][] generateField(int GRID_SIZE) {
 
 		boolean[][] field = new boolean[GRID_SIZE][GRID_SIZE];
 		Random random = new Random();
@@ -42,7 +41,7 @@ public class FieldGenerator {
 				}
 
 
-				if (x<0 || x>=GRID_SIZE || y<0 ||y>=GRID_SIZE) {//rand erreicht?
+				if (x<0 || x>=GRID_SIZE || y<0 ||y>=GRID_SIZE) {//rand erreicht? TODO: Methode zum Ziel
 					break;
 				}
 			}
@@ -52,7 +51,9 @@ public class FieldGenerator {
 		do {
 			targetX = random.nextInt(GRID_SIZE);
 			targetY = random.nextInt(GRID_SIZE);
-		} while ((!field[targetX][targetY]) || (targetX < 45 && targetX > 5) && (targetY < 45 && targetY > 5));
+		} while ((!field[targetX][targetY]) || (targetX < GRID_SIZE-5 && targetX > 5) && (targetY < GRID_SIZE-5 && targetY > 5));
+
+
 
 		System.out.println("targetX: " + targetX + " targetY: " + targetY);
 

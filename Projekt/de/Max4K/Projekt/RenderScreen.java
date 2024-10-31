@@ -14,7 +14,7 @@ public class RenderScreen {
 	private long window;
 
 
-	static final int GRID_SIZE = 50;
+	private static final int GRID_SIZE = 50;
 	private boolean[][] field;
 	private FieldGenerator fieldGen;
 	private Inputs inputs;
@@ -72,7 +72,7 @@ public class RenderScreen {
 
 	void loop() {
 
-		field = fieldGen.generateField();
+		field = fieldGen.generateField(GRID_SIZE);
 
 
 		glEnable(GL_DEPTH_TEST);
@@ -100,20 +100,21 @@ public class RenderScreen {
 			float angleY = inputs.getAngleY();
 			float oldPosX = inputs.getOldPosX();
 			float oldPosZ = inputs.getOldPosZ();
-			inputs.KeyPresses(window);
 
-			int gridX = (int) ((posX + (float) (50*5)/2)/5);//field nachahmen
-			int gridZ = (int) ((posZ + (float) (50*5)/2)/5);
+
+			int gridX = (int) ((posX + (float) (GRID_SIZE*5)/2)/5);//field nachahmen
+			int gridZ = (int) ((posZ + (float) (GRID_SIZE*5)/2)/5);
 
 			//Grenzen prüfen und kollision hinzufügen.
 			if (!field[gridX][gridZ]) {
 
 				inputs.setPosX(oldPosX);
 				inputs.setPosZ(oldPosZ);
+				posX = inputs.getPosX();
+				posZ = inputs.getPosZ();
 			}
 
-
-
+			inputs.KeyPresses(window);
 
 
 
@@ -150,6 +151,7 @@ public class RenderScreen {
 						}
 
 
+
 						glVertex3f(xPos, -1.0f, zPos);
 						glVertex3f(xPos + squareSize, -1.0f, zPos);
 						glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
@@ -167,8 +169,15 @@ public class RenderScreen {
 			glEnd();
 
 
+//gewinnabfrage
+if(gridX == fieldGen.targetX && gridZ == fieldGen.targetY) {
+	System.out.println("Gewonnen. Welt wird neu generiert.");
 
 
+	field = fieldGen.generateField(GRID_SIZE);
+	inputs.setPosX(0.0f);
+	inputs.setPosZ(0.0f);
+}
 
 
 
@@ -185,7 +194,7 @@ public class RenderScreen {
 	void renderWalls(int x, int z, float xPos, float zPos, float squareSize) {
 
 
-		glColor3f(0.8f, 0.8f, 0.8f);
+		glColor3f(0.8f, 0.8f, 0.8f); //TODO: Color exportieren
 
 		//left
 		if(x==0 || !field[x-1][z]) {

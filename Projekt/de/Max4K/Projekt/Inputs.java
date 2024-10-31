@@ -21,7 +21,7 @@ public class Inputs {
 	public Inputs(long window) {
 
 
-		glfwSetCursorPosCallback(window, new GLFWCursorPosCallback() {
+		glfwSetCursorPosCallback(window, new GLFWCursorPosCallback() { //TODO: passender methodenname
 			@Override
 			public void invoke(long window, double xpos, double ypos) {
 
