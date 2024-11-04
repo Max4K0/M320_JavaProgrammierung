@@ -8,6 +8,8 @@ public class FieldGenerator {
 	public int targetX;
 	public int targetY;
 
+
+
 	public boolean[][] generateField(int GRID_SIZE) {
 
 		boolean[][] field = new boolean[GRID_SIZE][GRID_SIZE];
@@ -41,7 +43,7 @@ public class FieldGenerator {
 				}
 
 
-				if (x<0 || x>=GRID_SIZE || y<0 ||y>=GRID_SIZE) {//rand erreicht? TODO: Methode zum Ziel
+				if (x<0 || x>=GRID_SIZE || y<0 ||y>=GRID_SIZE) {//rand erreicht?
 					break;
 				}
 			}
@@ -55,7 +57,7 @@ public class FieldGenerator {
 
 
 
-		System.out.println("targetX: " + targetX + " targetY: " + targetY);
+		//System.out.println("targetX: " + targetX + " targetY: " + targetY); //Cheat zum wissen des Ziels.
 
 
 

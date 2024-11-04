@@ -4,6 +4,7 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -14,22 +15,39 @@ public class RenderScreen {
 	private long window;
 
 
+
 	private static final int GRID_SIZE = 50;
+	private final int MAX_LEVELS = 3;
+	private final boolean FLY_MODE = false;
+	private final float FOV = 45.0f;
+	private final float RENDER_DISTANCE = 250;
+	private boolean TEXTURE_MODE = false;
+
 	private boolean[][] field;
-	private FieldGenerator fieldGen;
+	private final FieldGenerator fieldGen;
+	private FieldColor fieldColor;
+	private FieldTexture fieldTexture;
 	private Inputs inputs;
-
-
+	private int level = 1;
+	private long startTime;
+	private long gameTime = 0;
 
 	public RenderScreen() {
 		fieldGen = new FieldGenerator();
+
+		fieldColor = FieldColor.getInstance();
+
+		//fieldTexture = new FieldTexture("oak_planks.png", "oak_planks.png","oak_planks.png", "oak_planks.png");
 	}
 
+
 	public void run() {
-		System.out.println(Version.getVersion());
+		System.out.println("----- v" + Version.getVersion() + " -----");
 
 		create();
 		inputs = new Inputs(window);
+		startTime = System.currentTimeMillis();
+		inputs.setFlying(FLY_MODE);
 		loop();
 
 		glfwFreeCallbacks(window);
@@ -59,7 +77,7 @@ public class RenderScreen {
 			float aspectRatio = (float) width / height;
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			gluPerspective(45.0f, aspectRatio, 0.1f, 100.0f);
+			gluPerspective(FOV, aspectRatio, 0.01f, RENDER_DISTANCE);
 			glMatrixMode(GL_MODELVIEW);
 		});
 		glfwMakeContextCurrent(window);
@@ -80,7 +98,7 @@ public class RenderScreen {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		float aspect = 1200f / 800f;
-		gluPerspective(45.0f, aspect, 0.1f, 100.0f);
+		gluPerspective(FOV, aspect, 0.01f, RENDER_DISTANCE);
 		glMatrixMode(GL_MODELVIEW);
 
 		glClearColor(0.2f, 0.2f, 0.5f, 1.0f);//background
@@ -140,22 +158,27 @@ public class RenderScreen {
 						float xPos = startX + x * squareSize;
 						float zPos = startZ + z * squareSize;
 
-
-
-						if (x == GRID_SIZE / 2 && z == GRID_SIZE / 2) {
-							glColor3f(1.0f, 0.0f, 0.0f); // Hauptfeld
-						} else if(x == fieldGen.targetX && z ==fieldGen.targetY) {
-							glColor3f(1.0f, 1.0f, 0.0f);
+						if(TEXTURE_MODE) {
+							//fieldTexture.setFieldTexture(x,z, false, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
 						} else {
-							glColor3f(0.3f, 0.6f, 0.3f);
+							fieldColor.setFieldColor(x,z, false, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
 						}
-
-
+						//setFieldColor(x,z, false); old
 
 						glVertex3f(xPos, -1.0f, zPos);
 						glVertex3f(xPos + squareSize, -1.0f, zPos);
 						glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
 						glVertex3f(xPos, -1.0f, zPos + squareSize);
+
+						if(TEXTURE_MODE) {
+							//fieldTexture.setFieldTexture(x,z, true, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
+						} else {
+							fieldColor.setFieldColor(x,z, true, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
+						}
+						//setFieldColor(x,z, true);
+
+
+
 
 						renderWalls(x,z,xPos,zPos,squareSize);
 
@@ -169,19 +192,7 @@ public class RenderScreen {
 			glEnd();
 
 
-//gewinnabfrage
-if(gridX == fieldGen.targetX && gridZ == fieldGen.targetY) {
-	System.out.println("Gewonnen. Welt wird neu generiert.");
-
-
-	field = fieldGen.generateField(GRID_SIZE);
-	inputs.setPosX(0.0f);
-	inputs.setPosZ(0.0f);
-}
-
-
-
-
+			checkIfPlayerWon(gridX,gridZ);
 
 
 			glfwSwapBuffers(window);
@@ -192,9 +203,6 @@ if(gridX == fieldGen.targetX && gridZ == fieldGen.targetY) {
 
 
 	void renderWalls(int x, int z, float xPos, float zPos, float squareSize) {
-
-
-		glColor3f(0.8f, 0.8f, 0.8f); //TODO: Color exportieren
 
 		//left
 		if(x==0 || !field[x-1][z]) {
@@ -231,15 +239,51 @@ if(gridX == fieldGen.targetX && gridZ == fieldGen.targetY) {
 			glVertex3f(xPos, -1.0f + squareSize, zPos + squareSize);
 
 
-
-
 		}
 
 
 	}
 
 
+//old
+	void setFieldColor(int x, int z, boolean wall) {
 
+		if(wall) {
+			glColor3f(0.8f, 0.8f, 0.8f);
+			return;
+		}
+		if (x == GRID_SIZE / 2 && z == GRID_SIZE / 2) {
+			glColor3f(1.0f, 0.0f, 0.0f);//Hauptfeld
+		} else if(x == fieldGen.targetX && z ==fieldGen.targetY) {
+			glColor3f(1.0f, 1.0f, 0.0f);//Zielfeld
+		} else {
+			glColor3f(0.3f, 0.6f, 0.3f);//Boden
+		}
+	}
+
+	void checkIfPlayerWon(int gridX, int gridZ) {
+		if(gridX == fieldGen.targetX && gridZ == fieldGen.targetY) {
+			long endTime = System.currentTimeMillis();
+			long timeTaken = (endTime - startTime) / 1000;
+			System.out.println("Level " + level + " geschafft. \nZeit: " + timeTaken + " Sekunden. \n--------------------");
+			gameTime += timeTaken;
+
+			level++;
+			if (level > MAX_LEVELS) {
+				try {
+					throw new GameOverException("Du hast alle Level geschafft und " + gameTime + " Sekunden gebraucht.");
+				} catch (GameOverException e) {
+					System.out.println(e.getMessage());
+					glfwSetWindowShouldClose(window, true);
+				}
+			}
+
+			field = fieldGen.generateField(GRID_SIZE);
+			inputs.setPosX(0.0f);
+			inputs.setPosZ(0.0f);
+			startTime = System.currentTimeMillis();
+		}
+	}
 
 
 	//LWJGL klasse für 3d

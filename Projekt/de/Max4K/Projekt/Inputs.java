@@ -10,7 +10,7 @@ public class Inputs {
 	private float angleX = 0;
 	private float angleY = 0;
 	private float speed = 0.2f;
-	private boolean mouselock = true;
+	private boolean flying = true;
 
 
 	private float posX = 2 ;
@@ -20,31 +20,13 @@ public class Inputs {
 	private float oldPosZ = posZ;
 	public Inputs(long window) {
 
-
-		glfwSetCursorPosCallback(window, new GLFWCursorPosCallback() { //TODO: passender methodenname
+		glfwSetCursorPosCallback(window, new GLFWCursorPosCallback() {
 			@Override
 			public void invoke(long window, double xpos, double ypos) {
-
-
-
-				double deltaX = xpos - 750;
-				double deltaY = ypos - 500;
-
-				angleX += deltaY / 10;
-				angleY += deltaX / 10;
-
-
-
-				glfwSetCursorPos(window, 750, 500); //750, 500 je nach bildschirmgrösse
-
-
+				MouseCurser(window, xpos, ypos);
 
 			}
 		});
-
-
-
-
 
 	}
 
@@ -86,11 +68,17 @@ public class Inputs {
 		}
 
 
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && flying) {
+			if(posY > 50) {
+				posY = 50;
+			}
 			posY += speed;
 		}
 
-		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && flying) {
+			if(posY < -50) {
+				posY = -50;
+			}
 			posY -= speed;
 		}
 		if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_TRUE) {
@@ -111,17 +99,24 @@ public class Inputs {
 
 
 
-		// bregrenzen
-		if(posY > 50) {
-			posY = 50;
-		}
-		if(posY < -50) {
-			posY = -50;
-		}
+
 
 	}
 
 
+	void MouseCurser(long window, double xpos, double ypos) {
+		double deltaX = xpos - 750;
+		double deltaY = ypos - 500;
+
+		angleX += deltaY / 10;
+		angleY += deltaX / 10;
+
+
+
+		glfwSetCursorPos(window, 750, 500); //750, 500 je nach bildschirmgrösse
+
+
+	}
 
 
 	public float getAngleX() {
@@ -147,6 +142,9 @@ public class Inputs {
 	public void setPosZ(float posZ) {
 		this.posZ = posZ;
 	}
+	public void setFlying(boolean flying) {
+		this.flying = flying;
+	}
 
 	public float getOldPosX() {
 		return oldPosX;
@@ -155,4 +153,6 @@ public class Inputs {
 	public float getOldPosZ() {
 		return oldPosZ;
 	}
+
+
 }
