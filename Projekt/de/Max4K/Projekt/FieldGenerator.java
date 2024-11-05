@@ -18,7 +18,7 @@ public class FieldGenerator {
 		int centerX = GRID_SIZE / 2;
 		int centerY = GRID_SIZE / 2;
 
-		//startfeld in der mitte
+		//Startfeld in der Mitte
 		field[centerX][centerY] = true;
 
 

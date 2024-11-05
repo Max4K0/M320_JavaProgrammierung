@@ -1,76 +1,66 @@
 package de.Max4K.Projekt;
 
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryUtil;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.stb.STBImage.*;
 
 public class FieldTexture {
-	private int mainFieldTexture;
-	private int targetFieldTexture;
-	private int groundTexture;
-	private int wallTexture;
 
-
-	public FieldTexture(String mainFieldPath, String targetFieldPath, String groundPath, String wallPath) {
-		this.mainFieldTexture = loadTexture("resources/" + mainFieldPath);
-		this.targetFieldTexture = loadTexture("resources/" + targetFieldPath);
-		this.groundTexture = loadTexture("resources/" + groundPath);
-		this.wallTexture = loadTexture("resources/" + wallPath);
-	}
-
-	public void setFieldTexture(int x, int z, boolean wall, int gridSize, int targetX, int targetY) {
-		if (wall) {
-			glBindTexture(GL_TEXTURE_2D, wallTexture);
-			return;
-		}
-
-		if (x == gridSize / 2 && z == gridSize / 2) {
-			glBindTexture(GL_TEXTURE_2D, mainFieldTexture);
-		} else if (x == targetX && z == targetY) {
-			glBindTexture(GL_TEXTURE_2D, targetFieldTexture);
-		} else {
-			glBindTexture(GL_TEXTURE_2D, groundTexture);
+	public FieldTexture() {
+		try {
+			loadTexture("resources/floor.png");
+		} catch (Exception e) {
+			System.err.println("Fehler beim Laden der Texturen: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
-	//Laden einer Textur
-	private int loadTexture(String path) {
-		int textureID = Integer.MIN_VALUE;
 
-		try (MemoryStack stack = MemoryStack.stackPush()) {
-			IntBuffer width = stack.mallocInt(1);
-			IntBuffer height = stack.mallocInt(1);
-			IntBuffer channels = stack.mallocInt(1);
+	public int loadTexture(String filePath) throws IOException {
+		BufferedImage image = ImageIO.read(new File(filePath));
+		int width = image.getWidth();
+		int height = image.getHeight();
 
+		ByteBuffer buffer = MemoryUtil.memAlloc(width * height * 4);
 
-			ByteBuffer image = stbi_load(path, width, height, channels, 4);
-			if (image == null) {
-				throw new RuntimeException("Failed to load texture file: " + path + "\n" + stbi_failure_reason());
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				int pixel = image.getRGB(x, y);
+				buffer.put((byte) ((pixel >> 16) & 0xFF));  //Rot
+				buffer.put((byte) ((pixel >> 8) & 0xFF));   //Grün
+				buffer.put((byte) (pixel & 0xFF));          //Blau
+				buffer.put((byte) ((pixel >> 24) & 0xFF));  //Alpha
 			}
-
-
-			textureID = glGenTextures();
-			glBindTexture(GL_TEXTURE_2D, textureID);
-
-			//setzen
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-			//laden
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0), 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-			glGenerateMipmap(GL_TEXTURE_2D);
-
-			//freigeben
-			stbi_image_free(image);
 		}
+		buffer.flip();
+
+
+		int textureID = glGenTextures();
+		glBindTexture(GL_TEXTURE_2D, textureID);
+
+
+		//Textur setzen
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		//Bilddaten OpenGL geben.
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+		MemoryUtil.memFree(buffer);
 
 		return textureID;
 	}
+
 }
+

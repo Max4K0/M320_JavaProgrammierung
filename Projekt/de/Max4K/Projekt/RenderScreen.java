@@ -21,7 +21,7 @@ public class RenderScreen {
 	private final boolean FLY_MODE = false;
 	private final float FOV = 45.0f;
 	private final float RENDER_DISTANCE = 250;
-	private boolean TEXTURE_MODE = false;
+	private boolean TEXTURE_MODE = true;
 
 	private boolean[][] field;
 	private final FieldGenerator fieldGen;
@@ -37,7 +37,7 @@ public class RenderScreen {
 
 		fieldColor = FieldColor.getInstance();
 
-		//fieldTexture = new FieldTexture("oak_planks.png", "oak_planks.png","oak_planks.png", "oak_planks.png");
+
 	}
 
 
@@ -45,6 +45,7 @@ public class RenderScreen {
 		System.out.println("----- v" + Version.getVersion() + " -----");
 
 		create();
+		fieldTexture = new FieldTexture();
 		inputs = new Inputs(window);
 		startTime = System.currentTimeMillis();
 		inputs.setFlying(FLY_MODE);
@@ -94,6 +95,8 @@ public class RenderScreen {
 
 
 		glEnable(GL_DEPTH_TEST);
+		if(TEXTURE_MODE){glEnable(GL_TEXTURE_2D);}
+
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -124,8 +127,15 @@ public class RenderScreen {
 			int gridZ = (int) ((posZ + (float) (GRID_SIZE*5)/2)/5);
 
 			//Grenzen prüfen und kollision hinzufügen.
-			if (!field[gridX][gridZ]) {
+			try{
+				if (!field[gridX][gridZ]) {
 
+					inputs.setPosX(oldPosX);
+					inputs.setPosZ(oldPosZ);
+					posX = inputs.getPosX();
+					posZ = inputs.getPosZ();
+				}
+			} catch (Exception e) {
 				inputs.setPosX(oldPosX);
 				inputs.setPosZ(oldPosZ);
 				posX = inputs.getPosX();
@@ -158,24 +168,19 @@ public class RenderScreen {
 						float xPos = startX + x * squareSize;
 						float zPos = startZ + z * squareSize;
 
-						if(TEXTURE_MODE) {
-							//fieldTexture.setFieldTexture(x,z, false, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
-						} else {
-							fieldColor.setFieldColor(x,z, false, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
-						}
-						//setFieldColor(x,z, false); old
+						fieldColor.setFieldColor(x,z, false, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
 
+						glTexCoord2f(0.0f, 0.0f);
 						glVertex3f(xPos, -1.0f, zPos);
+						glTexCoord2f(1.0f, 0.0f);
 						glVertex3f(xPos + squareSize, -1.0f, zPos);
+						glTexCoord2f(1.0f, 1.0f);
 						glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
+						glTexCoord2f(0.0f, 1.0f);
 						glVertex3f(xPos, -1.0f, zPos + squareSize);
 
-						if(TEXTURE_MODE) {
-							//fieldTexture.setFieldTexture(x,z, true, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
-						} else {
-							fieldColor.setFieldColor(x,z, true, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
-						}
-						//setFieldColor(x,z, true);
+						fieldColor.setFieldColor(x,z, true, GRID_SIZE,fieldGen.targetX, fieldGen.targetY);
+
 
 
 
@@ -204,27 +209,40 @@ public class RenderScreen {
 
 	void renderWalls(int x, int z, float xPos, float zPos, float squareSize) {
 
+
 		//left
 		if(x==0 || !field[x-1][z]) {
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(xPos, -1.0f, zPos);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(xPos, -1.0f + squareSize, zPos);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(xPos, -1.0f + squareSize, zPos + squareSize);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(xPos, -1.0f, zPos + squareSize);
 
 		}
 		//right
 		if(x == GRID_SIZE - 1 || !field[x+1][z]) {
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(xPos + squareSize, -1.0f, zPos);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(xPos + squareSize, -1.0f + squareSize, zPos);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(xPos + squareSize, -1.0f + squareSize, zPos + squareSize);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
 		}
 
 		//front
 		if(z == 0 || !field[x][z-1]) {
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(xPos, -1.0f, zPos);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(xPos + squareSize, -1.0f, zPos);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(xPos + squareSize, -1.0f + squareSize, zPos);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(xPos, -1.0f + squareSize, zPos);
 
 
@@ -233,9 +251,13 @@ public class RenderScreen {
 
 		if(z == GRID_SIZE - 1 || !field[x][z+1]) {
 
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(xPos, -1.0f, zPos + squareSize);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(xPos + squareSize, -1.0f, zPos + squareSize);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(xPos + squareSize, -1.0f + squareSize, zPos + squareSize);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(xPos, -1.0f + squareSize, zPos + squareSize);
 
 
@@ -245,21 +267,6 @@ public class RenderScreen {
 	}
 
 
-//old
-	void setFieldColor(int x, int z, boolean wall) {
-
-		if(wall) {
-			glColor3f(0.8f, 0.8f, 0.8f);
-			return;
-		}
-		if (x == GRID_SIZE / 2 && z == GRID_SIZE / 2) {
-			glColor3f(1.0f, 0.0f, 0.0f);//Hauptfeld
-		} else if(x == fieldGen.targetX && z ==fieldGen.targetY) {
-			glColor3f(1.0f, 1.0f, 0.0f);//Zielfeld
-		} else {
-			glColor3f(0.3f, 0.6f, 0.3f);//Boden
-		}
-	}
 
 	void checkIfPlayerWon(int gridX, int gridZ) {
 		if(gridX == fieldGen.targetX && gridZ == fieldGen.targetY) {

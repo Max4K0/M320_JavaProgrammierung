@@ -72,6 +72,7 @@ Das Singleton-Pattern verhindert die Erzeugung zusätzlicher Instanzen und kann 
 ![GameOverException](GameOverException.png)
 
 
+### Usecasediagramm
 
 
-
+![Usecase](Usecase.png)
